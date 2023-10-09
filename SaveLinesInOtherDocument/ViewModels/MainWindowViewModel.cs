@@ -35,6 +35,15 @@ namespace SaveLinesInOtherDocument.ViewModels
         }
         #endregion
 
+        #region Выбранные линии
+        private string _selectLinesElemIds;
+        public string SelectLinesElemIds
+        {
+            get => _selectLinesElemIds;
+            set => Set(ref _selectLinesElemIds, value);
+        }
+        #endregion
+
         #region Команды
 
         #endregion

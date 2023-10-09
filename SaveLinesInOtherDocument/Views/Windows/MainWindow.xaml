@@ -68,6 +68,18 @@
         </Style>
     </Window.Resources>
     <StackPanel>
-        
+        <GroupBox Header="Линии"
+                  Style="{StaticResource BorderGroupStyle}">
+            <UniformGrid Columns="2">
+                <UniformGrid Rows="2">
+                    <TextBlock Text="Линии"
+                               Style="{StaticResource TextAboveButton}" />
+                    <Button Style="{StaticResource SelectButton}"
+                            Command="{Binding GetRoadAxis}" />
+                </UniformGrid>
+                <TextBox Text="{Binding SelectLinesElemIds, Mode=OneWay}"
+                         Style="{StaticResource SelectedItemsBox}" />
+            </UniformGrid>
+        </GroupBox>
     </StackPanel>
 </Window>
