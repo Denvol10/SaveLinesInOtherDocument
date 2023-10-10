@@ -63,6 +63,28 @@ namespace SaveLinesInOtherDocument.ViewModels
         }
         #endregion
 
+        #region Сохранение линий в файл
+        public ICommand SaveLinesCommand { get; }
+
+        private void OnSaveLinesCommandExecuted(object parameter)
+        {
+            RevitCommand.mainView.Hide();
+            RevitModel.SaveLines();
+            SaveSettings();
+            RevitCommand.mainView.Close();
+        }
+
+        private bool CanSaveLinesCommandExecute(object parameter)
+        {
+            if (string.IsNullOrEmpty(LinesElemIds))
+            {
+                return false;
+            }
+
+            return true;
+        }
+        #endregion
+
         #region Закрыть окно
         public ICommand CloseWindowCommand { get; }
 
@@ -112,6 +134,8 @@ namespace SaveLinesInOtherDocument.ViewModels
             #region Команды
 
             GetLinesCommand = new LambdaCommand(OnGetLinesCommandExecuted, CanGetLinesCommandExecute);
+
+            SaveLinesCommand = new LambdaCommand(OnSaveLinesCommandExecuted, CanSaveLinesCommandExecute);
 
             CloseWindowCommand = new LambdaCommand(OnCloseWindowCommandExecuted, CanCloseWindowCommand);
 
