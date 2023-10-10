@@ -36,17 +36,55 @@ namespace SaveLinesInOtherDocument.ViewModels
         #endregion
 
         #region Выбранные линии
-        private string _selectLinesElemIds;
-        public string SelectLinesElemIds
+        private string _linesElemIds;
+        public string LinesElemIds
         {
-            get => _selectLinesElemIds;
-            set => Set(ref _selectLinesElemIds, value);
+            get => _linesElemIds;
+            set => Set(ref _linesElemIds, value);
         }
         #endregion
 
         #region Команды
 
+        #region Получение линий
+        public ICommand GetLinesCommand { get; }
+
+        private void OnGetLinesCommandExecuted(object parameter)
+        {
+            RevitCommand.mainView.Hide();
+            RevitModel.GetLinesBySelection();
+            LinesElemIds = RevitModel.LinesElemIds;
+            RevitCommand.mainView.ShowDialog();
+        }
+
+        private bool CanGetLinesCommandExecute(object parameter)
+        {
+            return true;
+        }
         #endregion
+
+        #region Закрыть окно
+        public ICommand CloseWindowCommand { get; }
+
+        private void OnCloseWindowCommandExecuted(object parameter)
+        {
+            SaveSettings();
+            RevitCommand.mainView.Close();
+        }
+
+        private bool CanCloseWindowCommand(object parameter)
+        {
+            return true;
+        }
+        #endregion
+
+        #endregion
+
+        private void SaveSettings()
+        {
+            Properties.Settings.Default.LinesElemIds = LinesElemIds;
+            Properties.Settings.Default.Save();
+        }
 
 
         #region Конструктор класса MainWindowViewModel
@@ -54,7 +92,28 @@ namespace SaveLinesInOtherDocument.ViewModels
         {
             RevitModel = revitModel;
 
+            #region Инициализация элементов из Settings
+
+            #region Инициализация линий
+            if (!(Properties.Settings.Default.LinesElemIds is null))
+            {
+                string linesElemIdsInSettings = Properties.Settings.Default.LinesElemIds;
+                if (RevitModel.IsLinesExistInModel(linesElemIdsInSettings) && !string.IsNullOrEmpty(linesElemIdsInSettings))
+                {
+                    LinesElemIds = linesElemIdsInSettings;
+                    RevitModel.GetLinesBySettings(linesElemIdsInSettings);
+                }
+            }
+
+            #endregion
+
+            #endregion
+
             #region Команды
+
+            GetLinesCommand = new LambdaCommand(OnGetLinesCommandExecuted, CanGetLinesCommandExecute);
+
+            CloseWindowCommand = new LambdaCommand(OnCloseWindowCommandExecuted, CanCloseWindowCommand);
 
             #endregion
         }

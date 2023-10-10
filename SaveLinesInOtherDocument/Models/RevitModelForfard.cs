@@ -10,6 +10,7 @@ using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using Autodesk.Revit.DB.Architecture;
 using System.Collections.ObjectModel;
+using SaveLinesInOtherDocument.Models;
 
 namespace SaveLinesInOtherDocument
 {
@@ -28,6 +29,35 @@ namespace SaveLinesInOtherDocument
             Doc = uiapp.ActiveUIDocument.Document;
         }
 
+        public List<DirectShape> Lines { get; set; }
 
+        private string _linesElemIds;
+        public string LinesElemIds
+        {
+            get => _linesElemIds;
+            set => _linesElemIds = value;
+        }
+
+        public void GetLinesBySelection()
+        {
+            Lines = RevitGeometryUtils.GetLinseBySelection(Uiapp, out _linesElemIds);
+        }
+
+        #region Проверка на то существуют линии оси и линии на поверхности в модели
+        public bool IsLinesExistInModel(string elemIdsInSettings)
+        {
+            var elemIds = RevitGeometryUtils.GetIdsByString(elemIdsInSettings);
+
+            return RevitGeometryUtils.IsElemsExistInModel(Doc, elemIds, typeof(DirectShape));
+        }
+        #endregion
+
+        #region Получение линий Settings
+        public void GetLinesBySettings(string elemIdsInSettings)
+        {
+            var elemIds = RevitGeometryUtils.GetIdsByString(elemIdsInSettings);
+            Lines = RevitGeometryUtils.GetDirectShapeLinesById(Doc, elemIds);
+        }
+        #endregion
     }
 }
